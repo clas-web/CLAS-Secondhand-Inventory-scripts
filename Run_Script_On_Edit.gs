@@ -8,6 +8,7 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('OAT Functions')
   .addItem('Form Responses: Format request for Cherwell', 'copyToCherwell')
+  .addItem('Add Link to Cherwell', 'addCherwellLinkOptimized')
   .addToUi();
 }
 
@@ -34,7 +35,11 @@ function onEdit(e){
   //tracks which step of script to initiate
   var updater = 0;
   var counter = 0;
-  
+  //************************************************************************************************************************
+  //Adds Cherwell link to range of edited row's "Completed By/Work Order" column entry  
+  if (thisRow > 2 && ((sheetName == 'computers' && thisCol >= 14 && thisCol <= 16) || (sheetName == 'Form Responses 1' && thisCol == 14) || (sheetName == 'monitors' && thisCol >= 8 && thisCol <= 9) || (sheetName == 'surplus' && thisCol == 7))) {     
+    addCherwellLinkOptimized(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(thisRow, thisCol));
+  }
   //************************************************************************************************************************
   //*** Automatically update Age column
   
@@ -149,11 +154,11 @@ function copyToCherwell(){
                   "Type: " + range.getRange(row, 10).getDisplayValue()+ "\\n"+
                     "Comments: " + range.getRange(row, 11).getDisplayValue()+ "\\n"+
                       "\\n***TEMPLATE RESPONSE***"+
-                      "\\nHello, we've received your request for an upgraded machine. It should be complete in the next day or two, "+
-                        "after which we will contact you so we can coordinate delivery. You do not necessarily have to be present, but we do like to make sure you can log in without errors. "+
-                          "\\n\\nPlease make sure your personal files are backed up on your current machine because we will destroy the hard drive and surplus the computer after approximately 2 weeks."+
-                            "\\n\\nDo you also need any other peripherals? Mouse, keyboard, etc.",
-                              Browser.Buttons.OK);
+                        "\\nHello, we've received your request for an upgraded machine. It should be complete in the next day or two, "+
+                          "after which we will contact you so we can coordinate delivery. The user does not necessarily have to be present, but we do like to make sure they can log in without errors."+
+                            "\\n\\nIf there is a machine being replaced or sent to surplus, please make sure any personal files are backed up because we will destroy the hard drive and surplus the computer after approximately 2 weeks."+
+                              "\\n\\nDo you also require any other peripherals? Mouse, keyboard, speaker bar, etc.",
+                                Browser.Buttons.OK);
   } else if (row < 2){  
     //Don't allow for header row
     SpreadsheetApp.getActiveSpreadsheet().toast("Please select a valid row.");    
@@ -170,4 +175,28 @@ function copyToCherwell(){
   Purpose: "&I206&"
   Type: "&J206&"
   Comment: "&K206&""*/
+}
+
+/**
+* Add Cherwell hyperlink to work orders and usernames to directly link to Cherwell search
+* @param range The address of the cell to update (optional, if not included the selected range will be the range)
+*/
+
+function addCherwellLinkOptimized(range){
+  var selected = range || SpreadsheetApp.getActiveSheet().getActiveRange();
+  var values = selected.getValues();
+  var arr = [values];
+  
+  for (var i = 0; i < values.length; i++) {
+    arr[i] = [values[i]];
+    for (var j = 0; j < values[i].length; j++) {
+      if (values[i][j]){
+        arr[i][j] = '=HYPERLINK' + '("https://cherwell.uncc.edu/CherwellClient/Access/Command/Queries.GoToRecord?BusObID=Incident&PublicID='+values[i][j]+'","'+values[i][j]+'")';
+      } else {
+        arr[i][j] = "";
+      }      
+    }
+  }  
+  //Set hyperlink   
+  selected.setValues(arr);      
 }
