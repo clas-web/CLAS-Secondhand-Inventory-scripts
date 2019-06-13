@@ -12,7 +12,6 @@ function onOpen() {
   .addToUi();
 }
 
-
 function onEdit(e){
   //edited cell gets passed into function
   var range = e.range;
@@ -39,8 +38,8 @@ function onEdit(e){
   //Adds Cherwell link to range of edited row's "Completed By/Work Order" column entry  
   if (thisRow > 2 && ((sheetName == 'computers' && thisCol >= 14 && thisCol <= 18) || (sheetName == 'Form Responses 1' && thisCol == 14) || 
     (sheetName == 'monitors' && thisCol >= 8 && thisCol <= 9) || (sheetName == 'surplus' && thisCol == 7))) {     
-    addCherwellLinkOptimized(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(thisRow, thisCol));
-  }
+      addCherwellLinkOptimized(SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).getRange(thisRow, thisCol));
+    }
   //************************************************************************************************************************
   //*** Automatically update Age column
   
@@ -162,13 +161,20 @@ function copyToCherwell(){
                   "Type: " + range.getRange(row, 10).getDisplayValue()+ "\\n"+
                     "Comments: " + range.getRange(row, 11).getDisplayValue()+ "\\n"+
                       "\\n***TEMPLATE RESPONSE***"+
-                        "\\nHello, we've received your request for an upgraded machine. It should be complete in the next day or two, " +
-                          "after which we will contact you so we can coordinate delivery. The user does not necessarily have to be present," + 
-                            "but we do like to make sure they can log in without errors." +
-                            "\\n\\nIf there is a machine being replaced or sent to surplus, please make sure any personal files are backed up because" +
-                              "we will destroy the hard drive and surplus the computer after approximately 2 weeks." +
-                              "\\n\\nDo you also require any other peripherals? Mouse, keyboard, speaker bar, etc.",
-                                Browser.Buttons.OK);
+                        "\\nHello, we've received your request for an upgraded machine. It should be complete in the next business day or two, " +
+                          "after which we will contact you so we can coordinate delivery. You do not necessarily have to be present, " + 
+                            "but we do like to make sure you can log in without errors. The department admin can also unlock the door for us if " +
+                              "you can't be present due to your schedule. " +
+                                "\\n\\nIf there is a machine being replaced, please make sure any personal files are backed up. " +
+                                  "We will remove the hard drive to be destroyed after approximately 2 weeks. You are free to surplus the replaced machines " +
+                                    "after we have removed the hard drives." +
+                                      "\\n\\nDo you also require any other peripherals? Mouse, keyboard, speaker bar, etc.\\n\\nThanks!" + 
+                                        "\\n\\n***READY FOR DELIVERY***" + 
+                                          "\\nThis install will be ready for delivery and set up in " + range.getRange(row, 5).getDisplayValue() + " " + range.getRange(row, 6).getDisplayValue() + 
+                                            " <DATE & TIME>. Are you available then?" +
+                                              "\\n\\nIf you would prefer to be present during the installation (for instance, to instruct us where you would like the machine(s) placed) " +
+                                                "but you're not available, we can perform the install on another day as well. Otherwise, we can request an admin unlock the door for us. ",
+                                                  Browser.Buttons.OK);
   } else if (row < 2){  
     //Don't allow for header row
     SpreadsheetApp.getActiveSpreadsheet().toast("Please select a valid row.");    
